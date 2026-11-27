@@ -265,6 +265,10 @@ img{max-width:100%}
 .news a{color:inherit;text-decoration:none;font-family:var(--f-display);font-size:17px;line-height:1.3;text-wrap:pretty}
 .news a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 .news span{font-size:11.5px;color:var(--muted)}
+.nmeta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.news .saved{color:var(--ok);font-size:11.5px}
+.btn.idea{border-color:var(--clay);color:var(--clay)}
+.row .t span a{color:var(--clay)}
 .news.compact li{border-color:color-mix(in srgb,currentColor 18%,transparent);padding:8px 0}
 .news.compact a{font-size:15px}
 .news.compact span{color:inherit;opacity:.7}
@@ -655,7 +659,7 @@ V.inicio=()=>{
   <section class="grid g3">
     <div class="panel card-rose" style="display:flex;flex-direction:column;gap:10px">
       <div class="panel-h" style="margin:0"><h2>${ico('news')}Notícias do dia</h2><a class="link-arrow" href="#noticias">ver mais ↗</a></div>
-      ${newsList(G.news.destaques,4,true)}
+      ${newsList(G.news.destaques,4,{compact:true,topic:'destaques'})}
     </div>
     <div class="panel card-wine" style="display:flex;flex-direction:column;gap:12px">
       <div class="panel-h" style="margin:0"><h2>Conteúdo</h2><span class="mono">últimos 30 dias</span></div>
@@ -753,12 +757,13 @@ V.conteudo=()=>{
   `<div class="grid g3"><div class="panel card-wine"><div class="mono">Alcance total</div><div class="big">${total.toLocaleString('pt-BR')}</div><div style="margin-top:10px">${sparkline(sorted.map(p=>p.reach),'var(--on-wine)')}</div></div>
   <div class="panel"><div class="panel-h"><h2>Por rede</h2></div><div class="rows">${Object.entries(byPl).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="row" style="flex-direction:column;align-items:stretch;gap:5px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>${esc(k)}</span><span class="amt">${kfmt(v)}</span></div><div class="bar"><i style="width:${v/mx*100}%"></i></div></div>`).join('')||'<div class="empty">Sem dados ainda.</div>'}</div></div>
   <div class="panel"><div class="panel-h"><h2>Funil</h2></div><div class="stats" style="flex-direction:column;gap:10px">${['ideia','agendado','publicado'].map(s=>`<div style="flex-direction:row;justify-content:space-between;align-items:center"><span class="chip ${s}">${s}</span><b>${S.posts.filter(p=>p.status===s).length}</b></div>`).join('')}</div></div></div>
-  <div class="panel"><div class="panel-h"><h2>Posts</h2><span class="mono" style="color:var(--soft)">toque no status para avançar</span></div><div class="rows">${list.map(p=>`<div class="row"><div class="tx-ico">${ico('content')}</div><div class="t"><b>${esc(p.title)}</b><span>${esc(p.platform)} · ${fmtDay(p.date)}${p.reach?' · '+p.reach.toLocaleString('pt-BR')+' de alcance':''}</span></div><button class="chip ${p.status}" data-act="pstatus" data-id="${p.id}">${p.status}</button><button class="icon-btn" data-act="pdel" data-id="${p.id}" aria-label="Excluir">${ico('x')}</button></div>`).join('')}</div></div>`;
+  <div class="panel"><div class="panel-h"><h2>${ico('news')}Ideias: nutrição esportiva</h2><span style="display:flex;gap:6px"><button class="btn sm" data-act="newsreload" data-v="nutricao">↻</button><a class="btn sm" href="#noticias" data-act="gonutri">Ver todas</a></span></div>${newsList(G.news.nutricao,6,{topic:'nutricao',idea:true})}</div>
+  <div class="panel"><div class="panel-h"><h2>Posts</h2><span class="mono" style="color:var(--soft)">toque no status para avançar</span></div><div class="rows">${list.map(p=>`<div class="row"><div class="tx-ico">${ico('content')}</div><div class="t"><b>${esc(p.title)}</b><span>${esc(p.platform)} · ${fmtDay(p.date)}${p.reach?' · '+p.reach.toLocaleString('pt-BR')+' de alcance':''}${p.link?` · <a href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">notícia ↗</a>`:''}</span></div><button class="chip ${p.status}" data-act="pstatus" data-id="${p.id}">${p.status}</button><button class="icon-btn" data-act="pdel" data-id="${p.id}" aria-label="Excluir">${ico('x')}</button></div>`).join('')}</div></div>`;
 };
 
 
 /* ================= notícias e Google Agenda ================= */
-const TOPICOS=[['destaques','Destaques'],['brasil','Brasil'],['mundo','Mundo'],['economia','Economia'],['tecnologia','Tecnologia'],['ciencia','Ciência'],['saude','Saúde'],['esportes','Esportes'],['entretenimento','Entretenimento']];
+const TOPICOS=[['destaques','Destaques'],['nutricao','Nutrição esportiva'],['brasil','Brasil'],['mundo','Mundo'],['economia','Economia'],['tecnologia','Tecnologia'],['ciencia','Ciência'],['saude','Saúde'],['esportes','Esportes'],['entretenimento','Entretenimento']];
 const G={topic:'destaques',news:{},newsAt:{},newsErr:{},newsLoading:{},gcal:{conectado:null,eventos:[],erro:'',at:null,loading:false}};
 try{const c=JSON.parse(localStorage.getItem('recanto.extras')||'null');if(c){G.news=c.news||{};G.newsAt=c.newsAt||{};if(c.gcal)G.gcal={...G.gcal,...c.gcal,loading:false}}}catch(e){}
 const saveExtras=()=>{try{localStorage.setItem('recanto.extras',JSON.stringify({news:G.news,newsAt:G.newsAt,gcal:{conectado:G.gcal.conectado,eventos:G.gcal.eventos,at:G.gcal.at}}))}catch(e){}};
@@ -768,27 +773,28 @@ const refreshIf=(...routes)=>{if(routes.includes(ui.route)&&!$('#ov'))render()};
 async function loadNews(t,force){
   if(!sb||!cloud.uid)return;
   if(!force&&G.newsAt[t]&&Date.now()-new Date(G.newsAt[t])<10*60e3)return;
-  G.newsLoading[t]=true;G.newsErr[t]='';refreshIf('inicio','noticias');
+  G.newsLoading[t]=true;G.newsErr[t]='';refreshIf('inicio','noticias','conteudo');
   try{
     const {data,error}=await sb.functions.invoke('noticias',{body:{topico:t}});
     if(error||!data||data.erro)throw error||new Error(data?.erro||'sem dados');
     G.news[t]=data.itens;G.newsAt[t]=data.atualizado||new Date().toISOString();saveExtras();
   }catch(e){G.newsErr[t]='Não deu para carregar as notícias agora.'}
-  G.newsLoading[t]=false;refreshIf('inicio','noticias');
+  G.newsLoading[t]=false;refreshIf('inicio','noticias','conteudo');
 }
-function newsList(items,max,compact){
-  const t=compact?'destaques':G.topic;
+function newsList(items,max,o={}){
+  const t=o.topic||(o.compact?'destaques':G.topic);
   if(!items||!items.length){
-    if(G.newsErr[t])return `<div class="empty" style="color:inherit">${G.newsErr[t]} <button class="btn sm" data-act="newsreload">Tentar de novo</button></div>`;
+    if(G.newsErr[t])return `<div class="empty" style="color:inherit">${G.newsErr[t]} <button class="btn sm" data-act="newsreload" data-v="${t}">Tentar de novo</button></div>`;
     return `<div class="empty" style="color:inherit;opacity:.75">${G.newsLoading[t]||cloud.uid?'Carregando notícias…':'Entre para ver as notícias.'}</div>`;
   }
-  return `<ol class="news ${compact?'compact':''}">${items.slice(0,max).map(n=>`<li><a href="${esc(n.link)}" target="_blank" rel="noopener noreferrer">${esc(n.titulo)}</a><span>${esc(n.fonte||'')}${n.data?' · '+rel(n.data):''}</span></li>`).join('')}</ol>`;
+  const idea=n=>!o.idea?'':S.posts.some(p=>p.link===n.link)?`<span class="saved">✓ Já está nas ideias</span>`:`<button class="btn sm idea" data-act="toidea" data-t="${esc(n.titulo)}" data-l="${esc(n.link)}">${ico('plus')} Virar ideia de post</button>`;
+  return `<ol class="news ${o.compact?'compact':''}">${items.slice(0,max).map(n=>`<li><a href="${esc(n.link)}" target="_blank" rel="noopener noreferrer">${esc(n.titulo)}</a><div class="nmeta"><span>${esc(n.fonte||'')}${n.data?' · '+rel(n.data):''}</span>${idea(n)}</div></li>`).join('')}</ol>`;
 }
 V.noticias=()=>{
   const t=G.topic;
   return head('Notícias','Notícias','o que está acontecendo hoje',`<button class="btn" data-act="newsreload">↻ Atualizar</button>`)+
   `<div class="topics" role="tablist">${TOPICOS.map(([k,l])=>`<button role="tab" data-act="newstopic" data-v="${k}" aria-selected="${k===t}">${l}</button>`).join('')}</div>
-  <div class="panel">${newsList(G.news[t],25,false)}<div class="foot-note" style="color:var(--muted)">Fonte: Google Notícias · ${G.newsAt[t]?'atualizado '+rel(G.newsAt[t]):''}${G.newsLoading[t]?' · atualizando…':''}</div></div>`;
+  <div class="panel">${t==='nutricao'?'<p class="gc-p">Notícias das últimas 2 semanas sobre suplementação, proteína, dieta de atletas e hipertrofia. Toque em <b>Virar ideia de post</b> para guardar em Conteúdo.</p>':''}${newsList(G.news[t],25,{topic:t,idea:true})}<div class="foot-note" style="color:var(--muted)">Fonte: Google Notícias · ${G.newsAt[t]?'atualizado '+rel(G.newsAt[t]):''}${G.newsLoading[t]?' · atualizando…':''}</div></div>`;
 };
 async function loadGcal(){
   if(!sb||!cloud.uid)return;
@@ -813,7 +819,9 @@ function gcalPanel(){
 const GHELP='No computador, abra <b>calendar.google.com</b> → ⚙ Configurações → clique na sua agenda (em “Configurações das minhas agendas”) → desça até <b>Integrar agenda</b> → copie o <b>Endereço secreto no formato iCal</b>. Ele termina em <b>.ics</b>. Esse link é privado: não compartilhe.';
 const ACT_EXTRA={
   newstopic:e=>{G.topic=e.dataset.v;loadNews(G.topic);render();return 'skip'},
-  newsreload:()=>{loadNews(ui.route==='inicio'?'destaques':G.topic,true);return 'skip'},
+  newsreload:e=>{loadNews(e.dataset.v||(ui.route==='inicio'?'destaques':ui.route==='conteudo'?'nutricao':G.topic),true);return 'skip'},
+  gonutri:()=>{G.topic='nutricao';loadNews('nutricao');location.hash='noticias';return 'skip'},
+  toidea:e=>{S.posts.push({id:uid(),title:e.dataset.t,platform:'Instagram',status:'ideia',date:T,reach:0,link:e.dataset.l});toast('Ideia salva em Conteúdo')},
   gsync:()=>{loadGcal();return 'skip'},
   gconnect:()=>form('Conectar Google Agenda',[{id:'url',label:'Endereço secreto no formato iCal',required:true,placeholder:'https://calendar.google.com/calendar/ical/…/basic.ics',help:GHELP}],async d=>{
     const url=d.url.trim();
@@ -839,7 +847,7 @@ function render(){
   if(ui.route==='tarefas')bindDrag();
 }
 let lastRoute='';
-window.addEventListener('hashchange',()=>{if(location.hash==='#noticias')loadNews(G.topic);render();if(ui.route!==lastRoute){window.scrollTo(0,0);lastRoute=ui.route;scrollToday()}});
+window.addEventListener('hashchange',()=>{if(location.hash==='#noticias')loadNews(G.topic);if(location.hash==='#conteudo')loadNews('nutricao');render();if(ui.route!==lastRoute){window.scrollTo(0,0);lastRoute=ui.route;scrollToday()}});
 function scrollToday(){if(ui.route==='tarefas'){const c=$('#todaycol'),w=$('#week');if(c&&w)w.scrollLeft=c.offsetLeft-w.offsetLeft-8}}
 
 /* ================= ações ================= */
@@ -909,7 +917,7 @@ $('#gUp').addEventListener('click',()=>authSubmit('up'));
 if(!sb){showLogin('Não foi possível carregar o Supabase. Verifique a internet e recarregue a página.')}
 else sb.auth.onAuthStateChange((ev,session)=>{
   const uid=session?.user?.id||null;
-  if(uid&&uid!==cloud.uid){cloud.uid=uid;cloud.ready=false;$('#gate').hidden=true;cloud.load();loadNews('destaques');loadGcal()}
+  if(uid&&uid!==cloud.uid){cloud.uid=uid;cloud.ready=false;$('#gate').hidden=true;cloud.load();loadNews('destaques');loadGcal();if(ui.route==='conteudo')loadNews('nutricao');if(ui.route==='noticias')loadNews(G.topic)}
   else if(!uid){cloud.uid=null;cloud.ready=false;G.news={};G.newsAt={};G.gcal={conectado:null,eventos:[],erro:'',at:null,loading:false};try{localStorage.removeItem('recanto.extras')}catch(e){}showLogin();}
 });
 

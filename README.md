@@ -1,4 +1,4 @@
-# Recanto
+# Ritmo
 
 Central pessoal para organizar a vida: tarefas da semana, hábitos, segundo cérebro (notas), financeiro com cartões, agenda e conteúdo.
 

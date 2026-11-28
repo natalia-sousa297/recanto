@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Recanto</title>
+<title>Ritmo</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
@@ -282,6 +282,15 @@ img{max-width:100%}
 .news.compact li{border-color:color-mix(in srgb,currentColor 18%,transparent);padding:8px 0}
 .news.compact a{font-size:15px}
 .news.compact span{color:inherit;opacity:.7}
+.news .orig{font-size:11.5px;color:var(--soft);font-style:italic}
+.news .tipo{font-weight:500;color:var(--clay)}
+.qgroups{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.qgroup h3{margin:0 0 8px;font-family:var(--f-display);font-weight:500;font-size:16px}
+.qchips{display:flex;flex-wrap:wrap;gap:6px}
+.qchip{border:1px solid var(--line);background:var(--surface2);border-radius:99px;padding:5px 11px;font-size:12.5px;color:var(--ink);text-align:left}
+.qchip b{color:var(--clay);margin-left:2px}
+.qchip:hover{border-color:var(--clay)}
+.qchip.done{color:var(--ok);background:none}
 .topics{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .topics button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-size:13px;color:var(--muted);white-space:nowrap}
 .topics button[aria-selected="true"]{background:var(--wine);border-color:var(--wine);color:var(--on-wine)}
@@ -317,7 +326,7 @@ img{max-width:100%}
 .help{color:var(--muted);font-size:12px;line-height:1.5}
 .gate{position:fixed;inset:0;z-index:80;background:var(--paper);display:grid;place-items:center;padding:16px}
 .gate-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;width:min(380px,100%);display:flex;flex-direction:column;gap:12px}
-.gate-card .brand b{font-size:26px}
+.gate-card .brand b{font-size:26px;display:inline!important}
 .gate-sub{margin:0;color:var(--muted)}
 .gate-msg{margin:0;font-size:13px;color:var(--clay);min-height:1em}
 </style>
@@ -327,8 +336,8 @@ img{max-width:100%}
 <div class="app">
   <aside class="side">
     <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--wine)"/><path d="M16 25V11M16 12c-3 0-6-1-8 1M16 12c3 0 6-1 8 1M16 16c-2.5 0-5-.5-6.5 1M16 16c2.5 0 5-.5 6.5 1M16 20c-2 0-3.5 0-4.5 1M16 20c2 0 3.5 0 4.5 1" stroke="var(--on-wine)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
-      <b>Re<i>canto</i></b>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--wine)"/><path d="M6 17h4.2l2.3-5.5 3.6 10 3-8.2 1.6 3.7H26" stroke="var(--on-wine)" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>Rit<i>mo</i></b>
     </div>
     <nav class="nav" id="nav" aria-label="Seções"></nav>
     <div class="side-foot">
@@ -345,7 +354,7 @@ img{max-width:100%}
 <div id="layer"></div>
 <div class="gate" id="gate" hidden>
   <form class="gate-card" id="gForm" novalidate>
-    <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--wine)"/><path d="M16 25V11M16 12c-3 0-6-1-8 1M16 12c3 0 6-1 8 1M16 16c-2.5 0-5-.5-6.5 1M16 16c2.5 0 5-.5 6.5 1M16 20c-2 0-3.5 0-4.5 1M16 20c2 0 3.5 0 4.5 1" stroke="var(--on-wine)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><b>Re<i>canto</i></b></div>
+    <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--wine)"/><path d="M6 17h4.2l2.3-5.5 3.6 10 3-8.2 1.6 3.7H26" stroke="var(--on-wine)" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><b>Rit<i>mo</i></b></div>
     <p class="gate-sub">Entre para ver e salvar seus dados.</p>
     <div class="field"><label class="mono" for="gEmail">E-mail</label><input id="gEmail" type="email" autocomplete="email" required></div>
     <div class="field"><label class="mono" for="gPass">Senha</label><input id="gPass" type="password" autocomplete="current-password" minlength="6" required></div>
@@ -758,7 +767,7 @@ function sparkline(vals,stroke){
 /* ================= componentes ================= */
 function head(sec,title,sub,right=''){
   const d=TODAY;
-  return `<div class="head"><div><div class="crumb mono">Recanto / <span>${sec}</span> · ${DOW[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]}</div><h1>${title}${sub?`<small>${sub}</small>`:''}</h1></div><div style="display:flex;gap:8px;flex-wrap:wrap">${right}</div></div>`;
+  return `<div class="head"><div><div class="crumb mono">Ritmo / <span>${sec}</span> · ${DOW[d.getDay()]}, ${d.getDate()} de ${MES[d.getMonth()]}</div><h1>${title}${sub?`<small>${sub}</small>`:''}</h1></div><div style="display:flex;gap:8px;flex-wrap:wrap">${right}</div></div>`;
 }
 function miniCal(off){
   const base=new Date(TODAY.getFullYear(),TODAY.getMonth()+off,1);
@@ -791,7 +800,7 @@ V.inicio=()=>{
   return `
   <section class="hero">
     <div class="hero-txt">
-      <div class="crumb mono">Recanto / <span>Início</span> · ${DOW[TODAY.getDay()]}, ${TODAY.getDate()} de ${MES[TODAY.getMonth()]}</div>
+      <div class="crumb mono">Ritmo / <span>Início</span> · ${DOW[TODAY.getDay()]}, ${TODAY.getDate()} de ${MES[TODAY.getMonth()]}</div>
       <h1>${g}, <button data-act="rename" title="Mudar nome">${esc(S.name)}</button></h1>
       <div class="hero-sum">Você tem <b>${pend}</b> tarefa${pend===1?'':'s'} para hoje, <b>${habPend}</b> hábito${habPend===1?'':'s'} por marcar e <b>${evToday}</b> compromisso${evToday===1?'':'s'}.${late.length?` <span style="color:var(--bad)">${late.length} atrasada${late.length>1?'s':''}.</span>`:''}</div>
       <div class="quick">
@@ -927,7 +936,7 @@ V.conteudo=()=>{
       <div class="panel"><div class="panel-h"><h2>Próximos posts</h2></div><div class="rows">${upcoming.map(row).join('')||'<div class="empty">Nada agendado.</div>'}</div></div>
     </div>
   </div>
-  <div class="panel"><div class="panel-h"><h2>${ico('news')}Ideias: nutrição esportiva</h2><span style="display:flex;gap:6px"><button class="btn sm" data-act="newsreload" data-v="nutricao">↻</button><a class="btn sm" href="#noticias" data-act="gonutri">Ver todas</a></span></div>${newsList(G.news.nutricao,6,{topic:'nutricao',idea:true})}</div>`;
+  ${inspPanel()}`;
 };
 function bindPostDrag(){
   document.querySelectorAll('[data-pdrag]').forEach(el=>el.addEventListener('dragstart',ev=>{ev.stopPropagation();ev.dataTransfer.setData('text/plain',el.dataset.pdrag);ev.dataTransfer.effectAllowed='move'}));
@@ -997,7 +1006,7 @@ const ACT_EXTRA={
   newstopic:e=>{G.topic=e.dataset.v;loadNews(G.topic);render();return 'skip'},
   newsreload:e=>{loadNews(e.dataset.v||(ui.route==='inicio'?'destaques':ui.route==='conteudo'?'nutricao':G.topic),true);return 'skip'},
   gonutri:()=>{G.topic='nutricao';loadNews('nutricao');location.hash='noticias';return 'skip'},
-  toidea:e=>{S.posts.push({id:uid(),title:e.dataset.t,platform:'Instagram',format:'Reels',status:'ideia',date:'',time:'',account:ui.ctAcc!=='all'?ui.ctAcc:'',reach:0,link:e.dataset.l,caption:'',hashtags:'',notes:''});toast('Ideia salva em Conteúdo → Ideias sem data')},
+  toidea:e=>{S.posts.push({id:uid(),title:e.dataset.t,platform:'Instagram',format:'Reels',status:'ideia',date:'',time:'',account:ui.ctAcc!=='all'?ui.ctAcc:'',reach:0,link:e.dataset.l,caption:'',hashtags:'',notes:e.dataset.n||''});toast('Ideia salva em Conteúdo → Ideias sem data')},
   pnew:()=>postForm(),pedit:e=>postForm(e.dataset.id),pnewday:e=>postForm(null,{date:e.dataset.d}),
   accnew:()=>accountForm(),accedit:e=>accountForm(e.dataset.id),
   ctsel:e=>{ui.ctSel=e.dataset.d;render();if(matchMedia('(max-width:900px)').matches)$('#daypanel')?.scrollIntoView({behavior:'smooth',block:'start'});return 'skip'},
@@ -1012,6 +1021,63 @@ const ACT_EXTRA={
   },'Conectar'),
   gdisconnect:async()=>{const {error}=await sb.from('recanto_config').update({google_ical:null}).eq('user_id',cloud.uid);if(error){toast('Não deu para desconectar');return 'skip'}G.gcal={conectado:false,eventos:[],erro:'',at:null,loading:false};saveExtras();toast('Google Agenda desconectado');render();return 'skip'}
 };
+
+/* ================= inspiração para posts ================= */
+const INSP_TABS=[['noticias','Notícias'],['estudos','Estudos científicos'],['revisoes','Revisões e meta-análises'],['perguntas','O que o público pergunta']];
+G.insp={};G.inspAt={};G.inspErr={};G.inspLoading={};G.inspTab='noticias';
+try{const c=JSON.parse(localStorage.getItem('ritmo.insp')||'null');if(c){G.insp=c.insp||{};G.inspAt=c.at||{}}}catch(e){}
+async function loadInsp(t,force){
+  if(t==='noticias')return loadNews('nutricao',force);
+  if(!sb||!cloud.uid)return;
+  if(!force&&G.inspAt[t]&&Date.now()-new Date(G.inspAt[t])<30*60e3)return;
+  G.inspLoading[t]=true;G.inspErr[t]='';refreshIf('conteudo','noticias');
+  try{
+    const {data,error}=await sb.functions.invoke('inspiracao',{body:{tipo:t}});
+    if(error||!data||data.erro)throw error||new Error(data?.erro);
+    G.insp[t]=t==='perguntas'?data.grupos:data.itens;G.inspAt[t]=data.atualizado;
+    if(t!=='perguntas')traduzir(data.itens.map(a=>a.original));
+    try{localStorage.setItem('ritmo.insp',JSON.stringify({insp:G.insp,at:G.inspAt}))}catch(e){}
+  }catch(e){G.inspErr[t]='Não deu para carregar agora.'}
+  G.inspLoading[t]=false;refreshIf('conteudo','noticias');
+}
+// Tradução dos títulos em inglês, feita no aparelho e guardada para não repetir.
+let TRAD={};try{TRAD=JSON.parse(localStorage.getItem('ritmo.trad')||'{}')}catch(e){}
+async function traduzir(lista){
+  const falta=[...new Set(lista.filter(t=>!TRAD[t]))].slice(0,40);
+  for(let i=0;i<falta.length;i+=4){
+    await Promise.all(falta.slice(i,i+4).map(async t=>{
+      try{const r=await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q='+encodeURIComponent(t));if(!r.ok)return;const d=await r.json();const pt=(d[0]||[]).map(x=>x[0]).join('').trim();if(pt)TRAD[t]=pt}catch(e){}
+    }));
+  }
+  try{const keys=Object.keys(TRAD);if(keys.length>400)keys.slice(0,keys.length-400).forEach(k=>delete TRAD[k]);localStorage.setItem('ritmo.trad',JSON.stringify(TRAD))}catch(e){}
+  if(falta.length)refreshIf('conteudo');
+}
+const tr=a=>TRAD[a.original]||a.titulo;
+const isIdea=link=>S.posts.some(p=>p.link===link);
+const ideaBtn=(title,link,note)=>isIdea(link)?`<span class="saved">✓ Já está nas ideias</span>`:`<button class="btn sm idea" data-act="toidea" data-t="${esc(title)}" data-l="${esc(link)}" data-n="${esc(note||'')}">${ico('plus')} Virar ideia de post</button>`;
+function inspBody(t){
+  if(t==='noticias')return `<p class="gc-p">Notícias dos últimos dias sobre suplementação, proteína, treino e dieta, das mais novas para as mais antigas.</p>${newsList(G.news.nutricao,12,{topic:'nutricao',idea:true})}`;
+  const d=G.insp[t];
+  if(!d||!d.length){
+    if(G.inspErr[t])return `<div class="empty">${G.inspErr[t]} <button class="btn sm" data-act="inspreload">Tentar de novo</button></div>`;
+    return `<div class="empty">${G.inspLoading[t]?'Buscando…':'Carregando…'}</div>`;
+  }
+  if(t==='perguntas'){
+    return `<p class="gc-p">Buscas reais feitas no Google sobre nutrição esportiva. Cada dúvida pode virar um post. Toque em <b>+</b> para guardar como ideia.</p><div class="qgroups">${d.map(g=>`<div class="qgroup"><h3>${esc(g.tema)}…</h3><div class="qchips">${g.itens.map(q=>{const title=q.charAt(0).toUpperCase()+q.slice(1)+'?';const link='https://www.google.com/search?q='+encodeURIComponent(q);return isIdea(link)?`<span class="qchip done">✓ ${esc(q)}</span>`:`<button class="qchip" data-act="toidea" data-t="${esc(title)}" data-l="${esc(link)}" data-n="Dúvida buscada no Google: “${esc(q)}”">${esc(q)} <b>+</b></button>`}).join('')}</div></div>`).join('')}</div>`;
+  }
+  return `<p class="gc-p">${t==='estudos'?'Artigos publicados nas últimas semanas (PubMed). Ótimos para posts do tipo “o que a ciência diz”.':'Revisões e meta-análises recentes: juntam vários estudos e dão as conclusões mais fortes.'} Títulos traduzidos automaticamente.</p>
+  <ol class="news">${d.map(a=>`<li><a href="${esc(a.link)}" target="_blank" rel="noopener noreferrer">${esc(tr(a))}</a>${tr(a)!==a.original?`<span class="orig">${esc(a.original)}</span>`:''}<div class="nmeta"><span><b class="tipo">${esc(a.tipo)}</b> · ${esc(a.fonte)}${a.data?' · '+esc(a.data):''}</span>${ideaBtn(tr(a),a.link,`Base científica: ${a.tipo} — “${a.original}” (${a.fonte}, ${a.data||''}). ${a.link}`)}</div></li>`).join('')}</ol>`;
+}
+function inspPanel(){
+  const t=G.inspTab;const at=t==='noticias'?G.newsAt.nutricao:G.inspAt[t];
+  return `<div class="panel" id="insp"><div class="panel-h"><h2>${ico('trend')}Inspiração para posts</h2><button class="btn sm" data-act="inspreload">↻ Atualizar</button></div>
+  <div class="topics" role="tablist" style="margin-bottom:12px">${INSP_TABS.map(([k,l])=>`<button role="tab" data-act="insptab" data-v="${k}" aria-selected="${k===t}">${l}</button>`).join('')}</div>
+  ${inspBody(t)}<div class="foot-note" style="color:var(--muted)">${t==='noticias'?'Fonte: Google Notícias':t==='perguntas'?'Fonte: sugestões de busca do Google':'Fonte: PubMed (Biblioteca Nacional de Medicina dos EUA)'}${at?' · atualizado '+rel(at):''}</div></div>`;
+}
+Object.assign(ACT_EXTRA,{
+  insptab:e=>{G.inspTab=e.dataset.v;loadInsp(G.inspTab);render();return 'skip'},
+  inspreload:()=>{loadInsp(G.inspTab,true);return 'skip'}
+});
 
 /* ================= navegação ================= */
 const NAV=[['inicio','Início','home'],['tarefas','Tarefas','tasks'],['habitos','Hábitos','habit'],['cerebro','Segundo cérebro','brain'],['noticias','Notícias','news'],['agenda','Agenda','cal'],['conteudo','Conteúdo','content']];
@@ -1029,7 +1095,7 @@ function render(){
   if(ui.route==='conteudo')bindPostDrag();
 }
 let lastRoute='';
-window.addEventListener('hashchange',()=>{if(location.hash==='#noticias')loadNews(G.topic);if(location.hash==='#conteudo')loadNews('nutricao');render();if(ui.route!==lastRoute){window.scrollTo(0,0);lastRoute=ui.route;scrollToday()}});
+window.addEventListener('hashchange',()=>{if(location.hash==='#noticias')loadNews(G.topic);if(location.hash==='#conteudo')loadInsp(G.inspTab);render();if(ui.route!==lastRoute){window.scrollTo(0,0);lastRoute=ui.route;scrollToday()}});
 function scrollToday(){if(ui.route==='tarefas'){const c=$('#todaycol'),w=$('#week');if(c&&w)w.scrollLeft=c.offsetLeft-w.offsetLeft-8}}
 
 /* ================= ações ================= */
@@ -1096,7 +1162,7 @@ render();lastRoute=ui.route;scrollToday();
 /* app instalável */
 let installEvt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;$('#installBtn').hidden=false});
-window.addEventListener('appinstalled',()=>{installEvt=null;$('#installBtn').hidden=true;toast('Recanto instalado')});
+window.addEventListener('appinstalled',()=>{installEvt=null;$('#installBtn').hidden=true;toast('Ritmo instalado')});
 $('#installBtn').onclick=async()=>{if(!installEvt)return;installEvt.prompt();const r=await installEvt.userChoice;installEvt=null;if(r.outcome!=='accepted')$('#installBtn').hidden=true};
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* login */
@@ -1105,7 +1171,7 @@ $('#gUp').addEventListener('click',()=>authSubmit('up'));
 if(!sb){showLogin('Não foi possível carregar o Supabase. Verifique a internet e recarregue a página.')}
 else sb.auth.onAuthStateChange((ev,session)=>{
   const uid=session?.user?.id||null;
-  if(uid&&uid!==cloud.uid){cloud.uid=uid;cloud.ready=false;$('#gate').hidden=true;cloud.load();loadNews('destaques');loadGcal();if(ui.route==='conteudo')loadNews('nutricao');if(ui.route==='noticias')loadNews(G.topic)}
+  if(uid&&uid!==cloud.uid){cloud.uid=uid;cloud.ready=false;$('#gate').hidden=true;cloud.load();loadNews('destaques');loadGcal();if(ui.route==='conteudo')loadInsp(G.inspTab);if(ui.route==='noticias')loadNews(G.topic)}
   else if(!uid){if(cloud.chan){sb.removeChannel(cloud.chan);cloud.chan=null}cloud.uid=null;cloud.ready=false;cloud.versao=0;cloud.base=null;G.news={};G.newsAt={};G.gcal={conectado:null,eventos:[],erro:'',at:null,loading:false};try{localStorage.removeItem('recanto.extras')}catch(e){}showLogin();}
 });
 

@@ -1,6 +1,6 @@
-// Recanto: guarda a página para abrir rápido e sem internet.
+// Ritmo: guarda a página para abrir rápido e sem internet.
 // Sempre tenta a versão nova primeiro; dados (Supabase) nunca passam pelo cache.
-const CACHE = 'recanto-v1';
+const CACHE = 'ritmo-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
